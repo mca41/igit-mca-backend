@@ -20,7 +20,7 @@ The api is available @ 👉
 "frameWork": "Express 🚄",
 "warning": "Call me with bad name, I will respond 404🥴"
 }
-
+```
 ## Tech Stack
 
 
