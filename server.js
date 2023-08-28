@@ -1,5 +1,6 @@
 const express =  require("express")
 const bodyParser = require("body-parser");
+const cors = require("cors")
 const app = express();
 
 // -------- DATA BASE CONNECTION -----------
@@ -8,7 +9,8 @@ connectToDatabase();
 
 // ---------- MIDDLEWARE ------------
 app.use(bodyParser.urlencoded({ extended: false }))
-
+app.use(cors());
+app.use(express.json());
 // --------Home ROUTE ---------
 const homeResponseData = {
     response : "Welcome to IGIT MCA server."
