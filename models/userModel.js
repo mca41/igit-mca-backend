@@ -29,6 +29,7 @@ const userSchema = new Schema({
         regNum:Number,
         mobile:Number,
         gradCourse : String ,
+        password : String,
         socialLinks : {
             linkedInLink : {
                 type : String,
