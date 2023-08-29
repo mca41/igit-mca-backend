@@ -15,12 +15,12 @@ router.post("/createUser",
       body('email', "Enter a valid email").isEmail(),
       body('password', "Enter password at least 5 characters").notEmpty().isLength({ min: 5 })
    ]
-   ,checKFormData,
+   , checKFormData,
    async (req, res) => {
       try {
          // credentials
          // need to validate credentials
-         const { email,password, batch, lName, fName, regNum, fieldOfInterest, gradCourse, homeDist, linkedInLink, githubLink, mobile, profilePic, rollNum, tag } = req.body;
+         const { email, password, batch, lName, fName, regNum, fieldOfInterest, gradCourse, homeDist, linkedInLink, githubLink, mobile, profilePic, rollNum, tag } = req.body;
          // Step 1 : check if user email already exists
          const isExists = await User.findOne({ email: req.body.email })
          if (isExists) {
@@ -35,7 +35,7 @@ router.post("/createUser",
                email, batch,
                userDetails: {
                   fName, lName, homeDist, regNum, mobile,
-                  password : hashedPassword,
+                  password: hashedPassword,
                   socialLinks: {
                      linkedInLink, githubLink
                   }
@@ -59,7 +59,7 @@ router.post("/createUser",
             message: "internal server error! please try after some time",
          })
       }
-   });
+});
 
 
 
