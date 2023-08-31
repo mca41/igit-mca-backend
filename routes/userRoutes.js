@@ -6,27 +6,36 @@ const jwt = require('jsonwebtoken');
 const { body } = require('express-validator');
 const checKFormData = require("../middlewares/formData");
 const bcrypt = require('bcrypt');
+const multer  = require('multer')
+const storage = multer.memoryStorage(); // Store the uploaded image in memory
+const upload = multer({ storage });
 const saltRounds = 10;
 
 router.post("/createUser",
    // verifying credentials
-   [
-      body('fName', "Enter a valid name").isLength({ min: 3 }),
-      body('email', "Enter a valid email").isEmail(),
-      body('password', "Enter password at least 5 characters").notEmpty().isLength({ min: 5 })
-   ]
-   , checKFormData,
+   // [
+   //    body('fName', "Enter a valid name").isLength({ min: 3 }),
+   //    body('email', "Enter a valid email").isEmail(),
+   //    body('password', "Enter password at least 5 characters").notEmpty().isLength({ min: 5 })
+   // ]
+   // , checKFormData,
+   upload.single('imageFile'),
    async (req, res) => {
+      const textData = JSON.parse(req.body.textData);
+      const imageFile = req.file;
+      console.log(textData);
+      console.log(imageFile);
       try {
          // credentials
          // need to validate credentials
-         const { email, password, batch, lName, fName, regNum, fieldOfInterest, gradCourse, homeDist, linkedInLink, githubLink, mobile, profilePic, rollNum, tag } = req.body;
+         console.log("Form body");
+         const { email, password, batch, lName, fName, regNum, fieldOfInterest, gradCourse, homeDist, linkedInLink, githubLink, mobile, rollNum, tag } = textData;
          // Step 1 : check if user email already exists
-         const isExists = await User.findOne({ email: req.body.email })
+         const isExists = await User.findOne({ email })
          if (isExists) {
             res.status(409).json({
                success: false,
-               message: "User already exists. Please login!"
+               message: "User with same email already exists. Please login!"
             });
          } else {
             // --- Hash the password ----
@@ -54,13 +63,14 @@ router.post("/createUser",
             })
          }
       } catch (error) {
+         console.log(error);
          res.status(500).json({
             success: false,
             message: "internal server error! please try after some time",
+            error
          })
       }
 });
-
 
 
 
