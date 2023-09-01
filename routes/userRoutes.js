@@ -3,8 +3,6 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/userModel");
 const jwt = require('jsonwebtoken');
-const { body } = require('express-validator');
-const checKFormData = require("../middlewares/formData");
 const bcrypt = require('bcrypt');
 const multer  = require('multer')
 const storage = multer.memoryStorage(); // Store the uploaded image in memory
@@ -21,13 +19,6 @@ const profileImagesRef = ref(fireBaseStorage,"images/profileImages")
 // for 41 it will be images/profileImages/41/image-url
 
 router.post("/createUser",
-   // verifying credentials
-   // [
-   //    body('fName', "Enter a valid name").isLength({ min: 3 }),
-   //    body('email', "Enter a valid email").isEmail(),
-   //    body('password', "Enter password at least 5 characters").notEmpty().isLength({ min: 5 })
-   // ]
-   // , checKFormData,
    upload.single('imageFile'),
    async (req, res) => {
       const textData = JSON.parse(req.body.textData);
