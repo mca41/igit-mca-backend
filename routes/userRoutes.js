@@ -10,6 +10,15 @@ const multer  = require('multer')
 const storage = multer.memoryStorage(); // Store the uploaded image in memory
 const upload = multer({ storage });
 const saltRounds = 10;
+const { initializeApp } = require('firebase/app'); // require firebase
+const { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } = require("firebase/storage"); // getting required services from firestore
+const firebaseConfig = require("../firebase/firebaseConfig");
+
+// --- firebase APP --
+const fireBaseApp = initializeApp(firebaseConfig);
+const fireBaseStorage = getStorage(fireBaseApp); //points to root directory 
+const profileImagesRef = ref(fireBaseStorage,"images/profileImages")
+// for 41 it will be images/profileImages/41/image-url
 
 router.post("/createUser",
    // verifying credentials
