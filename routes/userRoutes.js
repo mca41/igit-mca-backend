@@ -25,12 +25,9 @@ router.post("/createUser",
    upload.single('imageFile'),
    async (req, res) => {
       const textData = JSON.parse(req.body.textData);
-      // console.log(textData);
-      console.log(req.file);
       try {
          // credentials
          // need to validate credentials
-         console.log("Form body");
          const { email, password, batch, lName, fName, regNum, fieldOfInterest, gradCourse, homeDist, linkedInLink, githubLink, mobile, rollNum, tag } = textData;
          // Step 1 : check if user email already exists
          const isExists = await User.findOne({ email })
@@ -71,17 +68,15 @@ router.post("/createUser",
                   contentType: fileType
                }
                if (fileType === "image/jpeg" || fileType === "image/png") {
-                  const uploadProfilePicRef = ref(profileImagesRef, `/${docGivenName}`);
+                  const uploadProfilePicRef = ref(profileImagesRef, `${batch}/${docGivenName}`);
                   //console.log(uploadProfilePicRef); // correct
                   //console.log(docGivenName);// correct
-                  uploadBytes(uploadProfilePicRef, req.file.buffer, metaData).then((snapshot) => {
+                  uploadBytes(uploadProfilePicRef, bufferData, metaData).then((snapshot) => {
                      getDownloadURL(snapshot.ref).then(async (downloadURL) => {
-                        console.log('Uploaded a blob or file!');
                         newUser.profilePic = {
                            givenName: docGivenName,
                            url: downloadURL
                         }
-                        console.log(newUser);
                         await newUser.save();
                         res.json({
                            success: true,
