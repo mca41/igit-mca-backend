@@ -15,9 +15,9 @@ const randomString = require("randomstring");
 const firebaseConfig = require("../firebase/firebaseConfig")
 const { initializeApp } = require("firebase/app");
 const app = initializeApp(firebaseConfig);
-const { getStorage, ref, uploadBytes } = require("firebase/storage");
+const { getStorage, ref, uploadBytes,getDownloadURL } = require("firebase/storage");
 const storage = getStorage();
-const imageRef = ref(storage, "/images")
+const profileImagesRef = ref(storage, "/images/profileImages")
 
 // for 41 it will be images/profileImages/41/image-url
 
@@ -71,17 +71,33 @@ router.post("/createUser",
                   contentType: fileType
                }
                if (fileType === "image/jpeg" || fileType === "image/png") {
-                  const uploadProfilePicRef = ref(imageRef, `/${docGivenName}`);
+                  const uploadProfilePicRef = ref(profileImagesRef, `/${docGivenName}`);
                   //console.log(uploadProfilePicRef); // correct
                   //console.log(docGivenName);// correct
                   uploadBytes(uploadProfilePicRef, req.file.buffer, metaData).then((snapshot) => {
-                     console.log(snapshot);
-                     console.log('Uploaded a blob or file!');
-                  }).catch((err) => {
+                     getDownloadURL(snapshot.ref).then(async (downloadURL) => {
+                        console.log('Uploaded a blob or file!');
+                        newUser.profilePic = {
+                           givenName: docGivenName,
+                           url: downloadURL
+                        }
+                        console.log(newUser);
+                        await newUser.save();
+                        res.json({
+                           success: true,
+                           message: "Account created successfully!",
+                           user: newUser,
+                           token
+                        })
+                     })
+                  }).catch(async (err) => {
                      console.log(err);
+                     await newUser.save();
                      res.json({
-                        success: false,
-                        message: "could not proceed",
+                        success: true,
+                        message: "Account created but profile picture upload failed!",
+                        user: newUser,
+                        token
                      })
                   })
                }
