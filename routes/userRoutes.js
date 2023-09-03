@@ -11,15 +11,13 @@ const saltRounds = 10;
 
 const randomString = require("randomstring");
 
-// --- firebase APP ADMIN SDK --
-const fireBaseAdmin = require("firebase-admin");
-const firebaseConfig = require("../firebase/firebaseAdminSdk");
-// initialiZing firebase sdk
-fireBaseAdmin.initializeApp({
-   credential: fireBaseAdmin.credential.cert(firebaseConfig),
-   storageBucket: process.env.FIREBASE_BUCKET,
-});
-const fireBaseBucket = fireBaseAdmin.storage().bucket();
+// --- firebase App setup --
+const firebaseConfig = require("../firebase/firebaseConfig")
+const { initializeApp } = require("firebase/app");
+const app = initializeApp(firebaseConfig);
+const { getStorage, ref, uploadBytes } = require("firebase/storage");
+const storage = getStorage();
+const imageRef = ref(storage, "/images")
 
 // for 41 it will be images/profileImages/41/image-url
 
@@ -27,9 +25,8 @@ router.post("/createUser",
    upload.single('imageFile'),
    async (req, res) => {
       const textData = JSON.parse(req.body.textData);
-      const imageFile = req.file;
-      console.log(textData);
-      console.log(imageFile);
+      // console.log(textData);
+      console.log(req.file);
       try {
          // credentials
          // need to validate credentials
@@ -73,19 +70,18 @@ router.post("/createUser",
                const metaData = {
                   contentType: fileType
                }
-               let uploadTask;
                if (fileType === "image/jpeg" || fileType === "image/png") {
-                  const config = {
-                     action: 'read'
-                  };
-                  fireBaseBucket.file(`$`).save(bufferData, metaData).getSignedUrl(config).then((urls) => {
-                     const downloadUrl = urls[0];
-                     console.log('Download URL:', downloadUrl);
+                  const uploadProfilePicRef = ref(imageRef, `/${docGivenName}`);
+                  //console.log(uploadProfilePicRef); // correct
+                  //console.log(docGivenName);// correct
+                  uploadBytes(uploadProfilePicRef, req.file.buffer, metaData).then((snapshot) => {
+                     console.log(snapshot);
+                     console.log('Uploaded a blob or file!');
+                  }).catch((err) => {
+                     console.log(err);
                      res.json({
-                        success: true,
-                        message: "user created & file uploaded to firebase",
-                        user: newUser,
-                        token
+                        success: false,
+                        message: "could not proceed",
                      })
                   })
                }
