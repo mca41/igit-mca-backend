@@ -8,15 +8,19 @@ const multer = require('multer')
 const multerStorage = multer.memoryStorage(); // Store the uploaded image in memory
 const upload = multer({ multerStorage });
 const saltRounds = 10;
-const { initializeApp } = require('firebase/app'); // require firebase
-const { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } = require("firebase/storage"); // getting required services from firestore
-const firebaseConfig = require("../firebase/firebaseConfig");
+
 const randomString = require("randomstring");
 
-// --- firebase APP --
-const fireBaseApp = initializeApp(firebaseConfig);
-const storage = getStorage(fireBaseApp); //points to root directory 
-const profileImagesRef = ref(storage, "/images/profileImages")
+// --- firebase APP ADMIN SDK --
+const fireBaseAdmin = require("firebase-admin");
+const firebaseConfig = require("../firebase/firebaseAdminSdk");
+// initialiZing firebase sdk
+fireBaseAdmin.initializeApp({
+   credential: fireBaseAdmin.credential.cert(firebaseConfig),
+   storageBucket: process.env.FIREBASE_BUCKET,
+});
+const fireBaseBucket = fireBaseAdmin.storage().bucket();
+
 // for 41 it will be images/profileImages/41/image-url
 
 router.post("/createUser",
@@ -52,11 +56,11 @@ router.post("/createUser",
                },
                fieldOfInterest, tag, gradCourse, rollNum
             })
-            // ---------- save file here -------
-             // --- Create JWT token ---
-             const data = { userId: newUser._id };
-             const token = jwt.sign(data, process.env.JWT_SECRET_CODE)
+            // --- Create JWT token ---
+            const data = { userId: newUser._id };
+            const token = jwt.sign(data, process.env.JWT_SECRET_CODE)
             let userProfileUrl;
+            // ---------- save file here -------
             if (req.file) {
                // profile pic 
                const fileType = req.file.mimetype;
@@ -71,42 +75,23 @@ router.post("/createUser",
                }
                let uploadTask;
                if (fileType === "image/jpeg" || fileType === "image/png") {
-                  const uploadProfilePicRef = ref(profileImagesRef, `/${docGivenName}`);
-                  uploadTask = uploadBytes(uploadProfilePicRef, bufferData, metaData);
-                  uploadTask.then((snapshot) => {
-                     getDownloadURL(snapshot.ref).then(async (downloadURL) => {
-                         userProfileUrl = downloadURL;
-                         console.log(downloadURL);
-                        // save profile picture url to users collection
-                        // newUser.profilePic.givenName = docGivenName ;
-                        // newUser.profilePic.url = downloadURL ;
-                         newUser.profilePic = {
-                           givenName : docGivenName,
-                           url : downloadURL
-                        }
-                        console.log(newUser);
-                        await newUser.save();
-                        res.json({
-                           success: true,
-                           message: "user created",
-                           user: newUser,
-                           token
-                        })
-                     })
-                  }).catch(async (error)=>{
-                     console.log(error);
-                     await newUser.save();
+                  const config = {
+                     action: 'read'
+                  };
+                  fireBaseBucket.file(`$`).save(bufferData, metaData).getSignedUrl(config).then((urls) => {
+                     const downloadUrl = urls[0];
+                     console.log('Download URL:', downloadUrl);
                      res.json({
                         success: true,
-                        message: "Firebase error came",
+                        message: "user created & file uploaded to firebase",
                         user: newUser,
                         token
                      })
                   })
                }
                // profile pic upload ends
-            }else{
-                //console.log(userProfileUrl);
+            } else {
+               //console.log(userProfileUrl);
                await newUser.save();
                res.json({
                   success: true,
