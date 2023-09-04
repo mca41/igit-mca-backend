@@ -15,12 +15,17 @@ const randomString = require("randomstring");
 const firebaseConfig = require("../firebase/firebaseConfig")
 const { initializeApp } = require("firebase/app");
 const app = initializeApp(firebaseConfig);
-const { getStorage, ref, uploadBytes,getDownloadURL } = require("firebase/storage");
+const { getStorage, ref, uploadBytes, getDownloadURL } = require("firebase/storage");
 const storage = getStorage();
 const profileImagesRef = ref(storage, "/images/profileImages")
 
-// for 41 it will be images/profileImages/41/image-url
-
+const admin = require('firebase-admin');
+const serviceAccount = require('../firebase/firebaseAdminSdk');
+admin.initializeApp({
+   credential: admin.credential.cert(serviceAccount),
+   databaseURL: 'https://your-project-id.firebaseio.com',
+ });
+ 
 router.post("/createUser",
    upload.single('imageFile'),
    async (req, res) => {
@@ -116,7 +121,24 @@ router.post("/createUser",
             error
          })
       }
-   });
+});
+
+// ROUTE 2 :: Login user by google Sign in
+router.post("/loginViaGoogle",async (req,res)=>{
+   try {
+      const decodedToken = await admin.auth().verifyIdToken(req.body.uid);
+      const email = decodedToken.email; // User's email
+      console.log(email);
+      res.json({
+         message : "success"
+      })
+   } catch (error) {
+      console.log(error);
+      res.json({
+         message : "hello"
+      })
+   }
+})
 
 
 
