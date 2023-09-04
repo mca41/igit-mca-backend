@@ -24,13 +24,13 @@ const serviceAccount = require('../firebase/firebaseAdminSdk');
 admin.initializeApp({
    credential: admin.credential.cert(serviceAccount),
    databaseURL: 'https://your-project-id.firebaseio.com',
- });
- 
+});
+
 router.post("/createUser",
    upload.single('imageFile'),
    async (req, res) => {
-      const textData = JSON.parse(req.body.textData);
       try {
+         const textData = JSON.parse(req.body.textData);
          // credentials
          // need to validate credentials
          const { email, password, batch, lName, fName, regNum, fieldOfInterest, gradCourse, homeDist, linkedInLink, githubLink, mobile, rollNum, tag } = textData;
@@ -74,8 +74,6 @@ router.post("/createUser",
                }
                if (fileType === "image/jpeg" || fileType === "image/png") {
                   const uploadProfilePicRef = ref(profileImagesRef, `${batch}/${docGivenName}`);
-                  //console.log(uploadProfilePicRef); // correct
-                  //console.log(docGivenName);// correct
                   uploadBytes(uploadProfilePicRef, bufferData, metaData).then((snapshot) => {
                      getDownloadURL(snapshot.ref).then(async (downloadURL) => {
                         newUser.profilePic = {
@@ -103,7 +101,6 @@ router.post("/createUser",
                }
                // profile pic upload ends
             } else {
-               //console.log(userProfileUrl);
                await newUser.save();
                res.json({
                   success: true,
@@ -121,25 +118,77 @@ router.post("/createUser",
             error
          })
       }
-});
+   });
 
 // ROUTE 2 :: Login user by google Sign in
-router.post("/loginViaGoogle",async (req,res)=>{
+router.post("/loginViaGoogle", async (req, res) => {
    try {
       const decodedToken = await admin.auth().verifyIdToken(req.body.uid);
       const email = decodedToken.email; // User's email
-      console.log(email);
-      res.json({
-         message : "success"
-      })
+      const isExist = await User.findOne({ email });
+      if (isExist) {
+         // --- Create JWT token ---
+         const data = { userId: isExist._id };
+         const token = jwt.sign(data, process.env.JWT_SECRET_CODE)
+         const user = await User.findById(isExist._id).select("-userDetails.password");
+         res.json({
+            success: true,
+            message: "Signed in successfully",
+            token,
+            user
+         })
+      } else {
+         res.status(404).json({
+            success: false,
+            message: "User does not exists",
+         })
+      }
    } catch (error) {
-      console.log(error);
-      res.json({
-         message : "hello"
+      res.status(500).json({
+         success: false,
+         message: "Some internal server occurred! Try after some time"
       })
    }
 })
 
+// ROUTE 2 :: Login by email & password manually
+router.post("/loginManually", async (req, res) => {
+   try {
+      const { email, password } = req.body;
+      const isExist = await User.findOne({ email });
+      if (isExist) {
+         // verify user password
+         const isPassMatched = bcrypt.compareSync(password, isExist.userDetails.password);
+         if (isPassMatched) {
+            const data = { userId: isExist._id };
+            const token = jwt.sign(data, process.env.JWT_SECRET_CODE)
+            const user = await User.findById(isExist._id).select("-userDetails.password");
+            res.json({
+               success: true,
+               message: "Signed in successfully",
+               token,
+               user
+            })
+         } else {
+            res.status(401).json({
+               success: false,
+               message: "Email or password is wrong",
+            })
+         }
+      }else{
+         // user not found
+         res.status(404).json({
+            success: false,
+            message: "User does not exists",
+         })
+      }
+   } catch (error) {
+      res.status(500).json({
+         success: false,
+         message: "Some internal server occurred! Try after some time"
+      })
+   }
+})
 
 
 
