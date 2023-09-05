@@ -23,9 +23,8 @@ const admin = require('firebase-admin');
 const serviceAccount = require('../firebase/firebaseAdminSdk');
 admin.initializeApp({
    credential: admin.credential.cert(serviceAccount),
-   databaseURL: 'https://your-project-id.firebaseio.com',
 });
-
+const authorizeUser = require("../middlewares/authorizeUser")
 router.post("/createUser",
    upload.single('imageFile'),
    async (req, res) => {
@@ -151,7 +150,7 @@ router.post("/loginViaGoogle", async (req, res) => {
    }
 })
 
-// ROUTE 2 :: Login by email & password manually
+// ROUTE 3 :: Login by email & password manually
 router.post("/loginManually", async (req, res) => {
    try {
       const { email, password } = req.body;
@@ -190,6 +189,12 @@ router.post("/loginManually", async (req, res) => {
    }
 })
 
-
+//ROUTE 4 :: fetch user
+router.get("/fetchUser", authorizeUser, async (req,res)=>{
+   //console.log(req.userId);
+   res.json({
+      message : "hello"
+   })
+})
 
 module.exports = router;
