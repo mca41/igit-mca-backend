@@ -174,7 +174,7 @@ router.post("/loginManually", async (req, res) => {
                message: "Email or password is wrong",
             })
          }
-      }else{
+      } else {
          // user not found
          res.status(404).json({
             success: false,
@@ -190,11 +190,22 @@ router.post("/loginManually", async (req, res) => {
 })
 
 //ROUTE 4 :: fetch user
-router.get("/fetchUser", authorizeUser, async (req,res)=>{
-   //console.log(req.userId);
-   res.json({
-      message : "hello"
-   })
+router.get("/fetchUser", authorizeUser, async (req, res) => {
+   try {
+      //console.log(req.userId);
+      const userId = req.userId
+      const findUser = await User.findById(userId).select("-userDetails.password")
+      res.json({
+         success: true,
+         message: "user data sent",
+         user: findUser
+      })
+   } catch (error) {
+      res.status(500).json({
+         success: false,
+         message: "Some internal server occurred! Try after some time"
+      })
+   }
 })
 
 module.exports = router;
