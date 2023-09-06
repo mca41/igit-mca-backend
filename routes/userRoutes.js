@@ -32,7 +32,7 @@ router.post("/createUser",
          const textData = JSON.parse(req.body.textData);
          // credentials
          // need to validate credentials
-         const { email, password, batch, lName, fName, regNum, fieldOfInterest, gradCourse, homeDist, linkedInLink, githubLink, mobile, rollNum, tag } = textData;
+         const { email, password, batch, lName, mName, fName, regNum, fieldOfInterest, gradCourse, homeDist, linkedInLink, githubLink, mobile, rollNum, tag } = textData;
          // Step 1 : check if user email already exists
          const isExists = await User.findOne({ email })
          if (isExists) {
@@ -46,7 +46,7 @@ router.post("/createUser",
             const newUser = new User({
                email, batch,
                userDetails: {
-                  fName, lName, homeDist, regNum, mobile,
+                  fName, lName, mName, homeDist, regNum, mobile,
                   password: hashedPassword,
                   socialLinks: {
                      linkedInLink, githubLink

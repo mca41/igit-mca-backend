@@ -16,7 +16,11 @@ const userSchema = new Schema({
     },
     userType: {
         type: String,
-        default: "user" //place "admin" for who maintains website
+        default: "user" 
+    },
+    isSpecialUser : {
+       type: String,
+       default : "" //place "admin" for who maintains website
     },
     status: {
         type: Number,
@@ -25,6 +29,7 @@ const userSchema = new Schema({
     userDetails: {
         fName: String,
         lName: String,
+        mName: String,
         homeDist: String,
         regNum:Number,
         mobile:Number,
