@@ -31,8 +31,8 @@ const userSchema = new Schema({
         lName: String,
         mName: String,
         homeDist: String,
-        regNum:Number,
-        mobile:Number,
+        regNum: String,
+        mobile:String,
         gradCourse : String ,
         password : String,
         socialLinks : {
@@ -47,8 +47,20 @@ const userSchema = new Schema({
         },
         otherThings: {},
     },
-    fieldOfInterest:String,
-    tag : String,
+    fieldOfInterest:{
+        type : String,
+        default: ""
+    },
+    // assigned coordination tag : ex - Class Representative or Placement Coordinator
+    tag : {
+        type : String,
+        default : ""
+    },
+    // any person who is assigned as a coordinator
+    isTag : {
+        type : Boolean,
+        default : false
+    },
     rollNum : Number,
     profilePic : {
         givenName : {
