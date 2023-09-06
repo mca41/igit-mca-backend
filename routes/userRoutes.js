@@ -46,7 +46,7 @@ router.post("/createUser",
             const newUser = new User({
                email, batch,
                userDetails: {
-                  fName, lName, mName, homeDist, regNum, mobile,
+                  fName, lName, mName, homeDist, regNum, mobile, gradCourse,
                   password: hashedPassword,
                   socialLinks: {
                      linkedInLink, githubLink
