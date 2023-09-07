@@ -21,6 +21,7 @@ const homeResponseData = {
 
 // -------- ALL ROUTES ----------------
 app.use("/api/user/", require("./routes/userRoutes"));
+app.use("/api/batch/",require("./routes/batchRoutes"))
 
 app.get("/",(req,res)=>{
     res.json(homeResponseData);

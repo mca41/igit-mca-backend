@@ -7,6 +7,9 @@ const userSchema = new Schema({
         unique: true,
         require
     },
+    batchId : {
+        type : Schema.ObjectId,
+    },
     registrationDate : {
       type : Date,
       default : Date.now
