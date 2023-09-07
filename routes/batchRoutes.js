@@ -73,7 +73,7 @@ router.post("/createNewBatch", authorizeUser, async (req, res) => {
                 message: "unauthorized access!",
             });
         }
-    } catch (error) { 
+    } catch (error) {
         console.log(error);
         res.status(500).json({
             success: false,
@@ -82,20 +82,42 @@ router.post("/createNewBatch", authorizeUser, async (req, res) => {
     }
 });
 
-router.get("/fetchAllBatch", authorizeUser ,async (req,res)=>{
-  try {
-    const findAllBatch = await Batch.find({branch : "mca"});
-    res.json({
-        success : true,
-        message : "All batches sent",
-        batches : findAllBatch
-    })
-  } catch (error) {
-     console.log(error);
-     res.status(500).json({
-        success: false,
-        message: "Internal server error",
-    });
-  }
+router.get("/fetchAllBatch", authorizeUser, async (req, res) => {
+    try {
+        const findAllBatch = await Batch.find({ branch: "mca" });
+        res.json({
+            success: true,
+            message: "All batches sent",
+            batches: findAllBatch
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+})
+
+// this route sends lists of batches with starting year & ending year :: No authorization required here!!
+router.get("/fetchBatchLists", async (req, res) => {
+    try {
+        const findAllBatchLists = await Batch.find({ branch: "mca" }).select({
+            studentLists: 0,
+            strength: 0,
+            branch: 0
+        });
+        res.json({
+            success: true,
+            message: "All batch lists sent!",
+            batchLists: findAllBatchLists
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
 })
 module.exports = router;
