@@ -82,4 +82,20 @@ router.post("/createNewBatch", authorizeUser, async (req, res) => {
     }
 });
 
+router.get("/fetchAllBatch", authorizeUser ,async (req,res)=>{
+  try {
+    const findAllBatch = await Batch.find({branch : "mca"});
+    res.json({
+        success : true,
+        message : "All batches sent",
+        batches : findAllBatch
+    })
+  } catch (error) {
+     console.log(error);
+     res.status(500).json({
+        success: false,
+        message: "Internal server error",
+    });
+  }
+})
 module.exports = router;
