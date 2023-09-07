@@ -4,20 +4,20 @@ const { Schema } = mongoose;
 const batchSchema = new Schema({
     batchNum : {
         type: Number,
-        require
+        required: true,
     },
     startingYear : {
         type : Number,
-        require
+        required: true,
     },
     endingYear : {
         type : Number,
-        require
+        required: true,
     },
     studentLists : [{ type: Schema.Types.ObjectId, ref: 'User' }],
     strength : {
         type : Number,
-        require
+        required: true,
     },
     branch : {
         type : String,
