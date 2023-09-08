@@ -5,7 +5,7 @@ const userSchema = new Schema({
     email: {
         type: String,
         unique: true,
-        require
+        required : true
     },
     batchId : {
         type : Schema.ObjectId,

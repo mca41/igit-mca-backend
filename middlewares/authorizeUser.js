@@ -28,6 +28,8 @@ const authorizeUser = (req, res, next) => {
                 })
             } else {
                 // user verified and userId added to request
+
+                // here you can also check whether user is actually exists in database :: Just for extra security 
                 req.userId = tokenData.userId;
                 next()
             }
