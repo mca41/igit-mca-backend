@@ -13,37 +13,32 @@ const createDefaultAdmin = async () => {
   const defaultAdminPassword = process.env.DEFAULT_ADMIN_PASSWORD;
   // ---- CREATES DEFAULT ADMIN for APPLICATION 
   //:: This helps when you deploy your entire application to new environment, when you need to register first, under category to create a new category (Especially when there is no category previously created, because category is created by user. So if there is no user there is no category, if there is no category how a user will register) :: This will form like DEAD LOCK SITUATION 
-  try {
-    if (defaultAdminEmail === undefined || defaultAdminPassword === undefined) {
-      // -- Throw error when default admin email or password not given ---
-      throw new Error("Default admin check or new admin creation failed. Please provide admin email & password parameter in .env file")
+  if (defaultAdminEmail === undefined || defaultAdminPassword === undefined) {
+    // -- Throw error when default admin email or password not given ---
+    throw new Error("Default admin check or new admin creation failed. Please provide admin email & password parameter in .env file")
+  } else {
+    // create default admin if not created previously
+    const findAdmin = await User.findOne({ email: defaultAdminEmail });
+    if (findAdmin) {
+      console.log("Admin exists 🛠️");
     } else {
-      // create default admin if not created previously
-      const findAdmin = await User.findOne({ email: defaultAdminEmail });
-      if (findAdmin) {
-        console.log("Admin exists 🛠️");
-      } else {
-        // create new admin
-        const hashedPassword = bcrypt.hashSync(defaultAdminPassword, saltRounds);
-        const newAdminUser = new User({
-          email: defaultAdminEmail,
-          isSpecialUser: "admin", // admin
-          status: 1, // verified
-          userDetails: {
-            fName: "Admin",
-            mName: "Igit",
-            lName: "MCA",
-            password: hashedPassword,
-          }
-        });
-        await newAdminUser.save()
-        console.log("Default admin created!");
-      }
+      // create new admin
+      const hashedPassword = bcrypt.hashSync(defaultAdminPassword, saltRounds);
+      const newAdminUser = new User({
+        email: defaultAdminEmail,
+        isSpecialUser: "admin", // admin
+        status: 1, // verified
+        userDetails: {
+          fName: "Admin",
+          mName: "Igit",
+          lName: "MCA",
+          password: hashedPassword,
+        }
+      });
+      await newAdminUser.save()
+      console.log("Default admin created!");
     }
-  } catch (error) {
-    console.log("Error in checking default admin!");
   }
-
   // --- create admin function ends ----
 }
 
