@@ -2,11 +2,11 @@ const express =  require("express")
 const bodyParser = require("body-parser");
 const cors = require("cors")
 const app = express();
-const createDefaultAdmin = require("./database/createDefaultAdminUser")
-// -------- DATA BASE CONNECTION -----------
 const connectToDatabase = require("./database/database");
-connectToDatabase();
-createDefaultAdmin();
+
+// -------- DATA BASE CONNECTION -----------
+connectToDatabase() // here database is connection takes place & a default admin user is created
+
 // ---------- MIDDLEWARE ------------
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cors());
@@ -34,5 +34,5 @@ app.get("/",(req,res)=>{
 
 const port = process.env.PORT || 5000 ;
 app.listen(port,()=>{
-   console.log("Server started in the port 5000. :) Happy coding");
+   console.log(`Server started in the port ${port}. :) Happy coding`);
 })
