@@ -2,11 +2,11 @@ const express =  require("express")
 const bodyParser = require("body-parser");
 const cors = require("cors")
 const app = express();
-
+const createDefaultAdmin = require("./database/createDefaultAdminUser")
 // -------- DATA BASE CONNECTION -----------
 const connectToDatabase = require("./database/database");
 connectToDatabase();
-
+createDefaultAdmin();
 // ---------- MIDDLEWARE ------------
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cors());
