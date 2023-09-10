@@ -17,7 +17,7 @@ const batchSchema = new Schema({
     studentLists : [{ type: Schema.Types.ObjectId, ref: 'User' }],
     strength : {
         type : Number,
-        required: true,
+        default : ""
     },
     branch : {
         type : String,
