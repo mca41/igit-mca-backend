@@ -134,7 +134,7 @@ router.get("/:batchNum/fetchStudents", authorizeUser, async (req, res) => {
       const students = await User.find({ batchId: isBatchExists._id })
         // this will neglect all these things
         .select({
-          email: 0,
+          // email: 0,
           batchId: 0,
           userDetails: {
             mobile: 0,
