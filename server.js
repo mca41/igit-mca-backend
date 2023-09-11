@@ -11,7 +11,7 @@ connectToDatabase() // here database is connection takes place & a default admin
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cors());
 app.use(express.json());
-// --------Home ROUTE ---------
+
 const homeResponseData = {
     response : "Welcome to IGIT MCA server."
 }
@@ -22,7 +22,10 @@ const homeResponseData = {
 // -------- ALL ROUTES ----------------
 app.use("/api/user/", require("./routes/userRoutes"));
 app.use("/api/batch/",require("./routes/batchRoutes"))
+app.use("/api/coordinators/",require("./routes/coordinators"));
 
+
+// ---- HOME ROUTE -----
 app.get("/",(req,res)=>{
     res.json(homeResponseData);
 })
