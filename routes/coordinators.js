@@ -6,13 +6,12 @@ const Batch = require("../models/batchModel")
 
 // No Authentication required :: Gives coordinators of seniors (2nd Year)
 
-router.get("/:batchNum", async (req, res) => {
+router.get("/:batchId", async (req, res) => {
     try {
-        const batchNum = req.params.batchNum;
-        const isBatchExists = await Batch.findOne({batchNum}) ;
+        const batchId = req.params.batchId;
+        const isBatchExists = await Batch.findById(batchId) ;
         if (isBatchExists) {
-            const batchCoordinators = await User.find({ batch: batchNum, isTag: true, status : 1 }).select({
-                email : 0,
+            const batchCoordinators = await User.find({ batchId: batchId, isTag: true, status : 1 }).select({
                 userDetails: {
                     password: 0,
                     mobile : 0,

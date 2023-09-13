@@ -52,7 +52,7 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
       mobile,
       rollNum,
       tag,
-    } = textData;
+    } = textData; // getting data from frontend
     // Step 1 : check if user email already exists
     const isExists = await User.findOne({ email });
     if (isExists) {
@@ -70,7 +70,7 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
         const hashedPassword = bcrypt.hashSync(password, saltRounds);
         const newUser = new User({
           email,
-          batch,
+          // batch, // not giving batchNum instead using batchId for find users of same batch. -> Because if batch Num is used in student it will be problem if we want to update batch
           batchId: isBatchExists._id,
           userDetails: {
             fName,

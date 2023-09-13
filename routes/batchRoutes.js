@@ -124,11 +124,11 @@ router.get("/fetchBatchLists", async (req, res) => {
 module.exports = router;
 
 // ROUTE :: TO FETCH STUDENTS OF A BATCH
-router.get("/:batchNum/fetchStudents", authorizeUser, async (req, res) => {
+router.get("/:batchId/fetchStudents", authorizeUser, async (req, res) => {
   try {
-    const batchNum = req.params.batchNum;
+    const batchId = req.params.batchId;
     // step 1 :: Check if batch exists or not
-    const isBatchExists = await Batch.findOne({ batchNum });
+    const isBatchExists = await Batch.findById(batchId);
     if (isBatchExists) {
       // find the students
       const students = await User.find({ batchId: isBatchExists._id })
@@ -143,7 +143,7 @@ router.get("/:batchNum/fetchStudents", authorizeUser, async (req, res) => {
         });
       res.json({
         success: true,
-        message: `${batchNum} batch students sent!`,
+        message: `${isBatchExists.batchNum} batch students sent!`,
         students,
       });
     } else {
