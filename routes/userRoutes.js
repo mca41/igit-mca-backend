@@ -25,11 +25,13 @@ const {
 const storage = getStorage();
 const profileImagesRef = ref(storage, "/images/profileImages");
 
-const admin = require("firebase-admin");
-const serviceAccount = require("../firebase/firebaseAdminSdk");
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+// --- to get the user email in encrypted format token 
+// const admin = require("firebase-admin");
+// const serviceAccount = require("../firebase/firebaseAdminSdk");
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+// });
+
 const authorizeUser = require("../middlewares/authorizeUser");
 router.post("/createUser", upload.single("imageFile"), async (req, res) => {
   try {
@@ -180,8 +182,10 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
 // ROUTE 2 :: Login user by google Sign in
 router.post("/loginViaGoogle", async (req, res) => {
   try {
-    const decodedToken = await admin.auth().verifyIdToken(req.body.uid);
-    const email = decodedToken.email; // User's email
+    // const decodedToken = await admin.auth().verifyIdToken(req.body.uid);
+    // const email = decodedToken.email; // User's email
+
+    const {email} = req.body;
     const isExist = await User.findOne({ email });
     if (isExist) {
       // --- Create JWT token ---
