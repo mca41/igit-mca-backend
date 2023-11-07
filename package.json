@@ -4,7 +4,8 @@
   "description": "\"Igit mca website backend development\"",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "npm start": "node server.js",
+    "dev" : "nodemon server.js"
   },
   "author": "Satyanarayan Dalei",
   "license": "ISC",
