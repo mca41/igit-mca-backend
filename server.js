@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express =  require("express")
 const bodyParser = require("body-parser");
 const cors = require("cors")
@@ -8,8 +9,11 @@ const connectToDatabase = require("./database/database");
 connectToDatabase() // here database is connection takes place & a default admin user is created
 
 // ---------- MIDDLEWARE ------------
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(cors());
+app.use(bodyParser.urlencoded({ extended: false }));
+const origin1 = process.env.ALLOWED_ORIGIN1;
+app.use(cors({
+    origin :[origin1,]
+}));
 app.use(express.json());
 
 const homeResponseData = {
