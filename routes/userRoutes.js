@@ -14,6 +14,7 @@ const randomString = require("randomstring");
 
 // --- firebase App setup --
 const firebaseConfig = require("../firebase/firebaseConfig");
+// console.log(firebaseConfig);
 const { initializeApp } = require("firebase/app");
 const app = initializeApp(firebaseConfig);
 const {
@@ -22,7 +23,7 @@ const {
   uploadBytes,
   getDownloadURL,
 } = require("firebase/storage");
-const storage = getStorage();
+const storage = getStorage(app);
 const profileImagesRef = ref(storage, "/images/profileImages");
 
 // --- to get the user email in encrypted format token 
