@@ -12,7 +12,7 @@ connectToDatabase() // here database is connection takes place & a default admin
 app.use(bodyParser.urlencoded({ extended: false }));
 const origin1 = process.env.ALLOWED_ORIGIN1;
 app.use(cors({
-    origin :[origin1,]
+    origin :[origin1]
 }));
 app.use(express.json());
 
