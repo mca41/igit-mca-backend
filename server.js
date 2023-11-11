@@ -11,8 +11,11 @@ connectToDatabase() // here database is connection takes place & a default admin
 // ---------- MIDDLEWARE ------------
 app.use(bodyParser.urlencoded({ extended: false }));
 const origin1 = process.env.ALLOWED_ORIGIN1;
+console.log("Origin 1 ", origin1);
 app.use(cors({
-    origin :[origin1]
+    origin : process.env.ALLOWED_ORIGIN1,
+   methods:["GET","POST","DELETE","PUT"],
+   credentials : true
 }));
 app.use(express.json());
 
