@@ -14,9 +14,12 @@ const userSchema = new Schema({
       type : Date,
       default : Date.now
     },
-    // batch : {
-    //     type : Number
-    // },
+    batch : {
+        type : Number
+    },
+    batchNum : {
+        type:Number
+    },
     userType: {
         type: String,
         default: "user" 

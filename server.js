@@ -29,7 +29,7 @@ const homeResponseData = {
 app.use("/api/user/", require("./routes/userRoutes"));
 app.use("/api/batch/",require("./routes/batchRoutes"))
 app.use("/api/coordinators/",require("./routes/coordinators"));
-
+app.use("/api/accounts",require("./routes/adminRoutes")); // fetches all users account for admin page
 
 // ---- HOME ROUTE -----
 app.get("/",(req,res)=>{

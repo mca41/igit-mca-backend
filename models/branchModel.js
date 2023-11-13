@@ -7,7 +7,7 @@ const branchSchema = new Schema({
         type : String,
         default : "mca"
     },
-    allBatchIds : [{ type: Schema.Types.ObjectId, ref: 'Batch' }]
+    // allBatchIds : [{ type: Schema.Types.ObjectId, ref: 'Batch' }]
 })
 
 module.exports = mongoose.model("Branch", branchSchema);

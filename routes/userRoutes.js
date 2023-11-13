@@ -93,6 +93,7 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
           tag,
           gradCourse,
           rollNum,
+          batchNum:isBatchExists.batchNum ,
         });
         // --- Create JWT token ---
         const data = { userId: newUser._id };
@@ -128,8 +129,8 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
                   };
                   await newUser.save();
                   // after user saved , push its id to batch student list
-                  isBatchExists.studentLists.push(newUser._id);
-                  isBatchExists.save();
+                  // isBatchExists.studentLists.push(newUser._id); // not use full
+                  // isBatchExists.save();
                   res.json({
                     success: true,
                     message: "Account created successfully!",
@@ -142,8 +143,8 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
                 console.log(err);
                 await newUser.save();
                 // after user saved , push its id to batch student list
-                isBatchExists.studentLists.push(newUser._id);
-                isBatchExists.save();
+                // isBatchExists.studentLists.push(newUser._id); // not use full
+                // isBatchExists.save(); //not use full
                 res.json({
                   success: true,
                   message: "Account created but profile picture upload failed!",

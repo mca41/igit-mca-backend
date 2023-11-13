@@ -39,8 +39,8 @@ router.post("/createNewBatch", authorizeUser, async (req, res) => {
           const isBranchExists = await Branch.findOne({ branch: "mca" });
           if (isBranchExists) {
             // branch already exists so just add new batch to existing branch
-            isBranchExists.allBatchIds.push(newBatch._id);
-            await isBranchExists.save();
+            // isBranchExists.allBatchIds.push(newBatch._id); // not use full
+            // await isBranchExists.save();  // not use full
             res.json({
               success: true,
               message: `Batch created & added to ${isBranchExists.branch} branch !`,
@@ -51,7 +51,7 @@ router.post("/createNewBatch", authorizeUser, async (req, res) => {
             let branch = "mca"; // new branch name mca :- It will be created only once
             const newBranch = new Branch({
               branch: branch,
-              allBatchIds: [newBatch._id],
+              // allBatchIds: [newBatch._id],// not use full
             });
             await newBranch.save();
             res.json({

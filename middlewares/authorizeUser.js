@@ -5,7 +5,7 @@ const authorizeUser = (req, res, next) => {
     try {
         const authToken = req.headers.token;
         if (!authToken) {
-            res.status(401).json({
+           return res.status(401).json({
                 success: false,
                 message: "unauthorized access"
             })
@@ -22,7 +22,7 @@ const authorizeUser = (req, res, next) => {
             // token data looks something like bellow after jwt verify
             //tokenData = { userId: '64ece6173b49e65733af30a7', iat: 1693247934 } <-- this is something formed when assigning token id
             if (tokenData === "not verified") {
-                res.status(401).json({
+                return res.status(401).json({
                     success: false,
                     message: "unauthorized access"
                 })
