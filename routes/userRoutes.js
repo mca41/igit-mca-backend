@@ -4,17 +4,16 @@ const router = express.Router();
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const randomString = require("randomstring");
 const multer = require("multer");
 const multerStorage = multer.memoryStorage(); // Store the uploaded image in memory
 const upload = multer({ multerStorage });
+
 const saltRounds = 10;
 const Batch = require("../models/batchModel");
-
-const randomString = require("randomstring");
-
+const {sendAccountCreatedMail} = require("../helper/sendMail");
 // --- firebase App setup --
 const firebaseConfig = require("../firebase/firebaseConfig");
-// console.log(firebaseConfig);
 const { initializeApp } = require("firebase/app");
 const app = initializeApp(firebaseConfig);
 const {
@@ -59,7 +58,7 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
     // Step 1 : check if user email already exists
     const isExists = await User.findOne({ email });
     if (isExists) {
-      res.status(409).json({
+      return res.status(409).json({
         success: false,
         message: "User with same email already exists. Please login!",
       });
