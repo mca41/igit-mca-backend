@@ -11,7 +11,11 @@ const upload = multer({ multerStorage });
 
 const saltRounds = 10;
 const Batch = require("../models/batchModel");
-const {sendAccountCreatedMail} = require("../helper/sendMail");
+const {
+  emailAdminNewUserRegistered,
+  emailNewUser,
+} = require("../helper/sendMail");
+
 // --- firebase App setup --
 const firebaseConfig = require("../firebase/firebaseConfig");
 const { initializeApp } = require("firebase/app");
@@ -25,7 +29,8 @@ const {
 const storage = getStorage(app);
 const profileImagesRef = ref(storage, "/images/profileImages");
 
-// --- to get the user email in encrypted format token 
+const adminEmail = process.env.ADMIN_NOTIFY_EMAIL; // admin will be notified when a new user gets registered
+// --- to get the user email in encrypted format token
 // const admin = require("firebase-admin");
 // const serviceAccount = require("../firebase/firebaseAdminSdk");
 // admin.initializeApp({
@@ -42,6 +47,7 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
       email,
       password,
       batch,
+      name,
       lName,
       mName,
       fName,
@@ -64,7 +70,7 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
       });
     } else {
       // first find that batch
-      const isBatchExists = await Batch.findOne({ batchNum:batch });
+      const isBatchExists = await Batch.findOne({ batchNum: batch });
       if (isBatchExists) {
         // Batch exists - Do User Registration
         // ----- USER REGISTRATION STARTS --
@@ -75,6 +81,7 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
           // batch, // not giving batchNum instead using batchId for find users of same batch. -> Because if batch Num is used in student it will be problem if we want to update batch
           batchId: isBatchExists._id,
           userDetails: {
+            name,
             fName,
             lName,
             mName,
@@ -92,12 +99,13 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
           tag,
           gradCourse,
           rollNum,
-          batchNum:isBatchExists.batchNum ,
+          batchNum: isBatchExists.batchNum,
         });
         // --- Create JWT token ---
         const data = { userId: newUser._id };
         const token = jwt.sign(data, process.env.JWT_SECRET_CODE);
-        let userProfileUrl;
+        let userProfileUrl = "";
+        let finalMessage = "User created!";
         // ---------- save file here -------
         if (req.file) {
           // profile pic
@@ -114,57 +122,54 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
           const metaData = {
             contentType: fileType,
           };
+          // ---- if user has sent profile image , first save to firebase
           if (fileType === "image/jpeg" || fileType === "image/png") {
-            const uploadProfilePicRef = ref(
-              profileImagesRef,
-              `${batch}/${docGivenName}`
-            );
-            uploadBytes(uploadProfilePicRef, bufferData, metaData)
-              .then((snapshot) => {
-                getDownloadURL(snapshot.ref).then(async (downloadURL) => {
-                  newUser.profilePic = {
-                    givenName: docGivenName,
-                    url: downloadURL,
-                  };
-                  await newUser.save();
-                  // after user saved , push its id to batch student list
-                  // isBatchExists.studentLists.push(newUser._id); // not use full
-                  // isBatchExists.save();
-                  res.json({
-                    success: true,
-                    message: "Account created successfully!",
-                    user: newUser,
-                    token,
-                  });
-                });
-              })
-              .catch(async (err) => {
-                console.log(err);
-                await newUser.save();
-                // after user saved , push its id to batch student list
-                // isBatchExists.studentLists.push(newUser._id); // not use full
-                // isBatchExists.save(); //not use full
-                res.json({
-                  success: true,
-                  message: "Account created but profile picture upload failed!",
-                  user: newUser,
-                  token,
-                });
-              });
+              const uploadProfilePicRef = ref(
+                profileImagesRef,
+                `${batch}/${docGivenName}`
+              );
+              const snapShot = await uploadBytes(
+                uploadProfilePicRef,
+                bufferData,
+                metaData
+              );
+              userProfileUrl = await getDownloadURL(snapShot.ref);
           }
-          // profile pic upload ends
-        } else {
-          await newUser.save();
-          res.json({
-            success: true,
-            message: "user created",
-            user: newUser,
-            token,
-          });
+          if (userProfileUrl === "" || userProfileUrl === "error") {
+            finalMessage = "Account created but profile picture upload failed!";
+          } else {
+            finalMessage = "Account created & profile picture uploaded!";
+            newUser.profilePic = {
+              givenName: docGivenName,
+              url: userProfileUrl,
+            };
+          }
         }
+        await newUser.save();
+        const userFullName = newUser.userDetails.fName + " " + newUser.userDetails.mName + " " + newUser.userDetails.lName ;
+        isBatchExists.totalRegistered += 1; // isBatchExists.totalRegistered = isBatchExists.totalRegistered + 1
+        await isBatchExists.save();
+        // ----------- Send Email to new user ------
+        const isEmailSent = await emailNewUser(newUser.email, userFullName);
+        const isAdminAlerted = await emailAdminNewUserRegistered(adminEmail, {
+          email: newUser.email,
+          name: userFullName,
+          batch: newUser.batchNum,
+        });
+        console.log(" user mail ",isEmailSent);
+        console.log(" admin alert " ,isAdminAlerted);
+        // ----------- Send Email to new user ------
+        return res.json({
+          success: true,
+          message: finalMessage,
+          user: newUser,
+          token,
+          isEmailSentToUser: isEmailSent,
+          isAdminNotified: isAdminAlerted,
+        });
         // ----- USER REGISTRATION Ends --
       } else {
-        res.status(404).json({
+        return res.status(404).json({
           success: false,
           message: "Batch not found!",
         });
@@ -186,7 +191,7 @@ router.post("/loginViaGoogle", async (req, res) => {
     // const decodedToken = await admin.auth().verifyIdToken(req.body.uid);
     // const email = decodedToken.email; // User's email
 
-    const {email} = req.body;
+    const { email } = req.body;
     const isExist = await User.findOne({ email });
     if (isExist) {
       // --- Create JWT token ---
@@ -195,14 +200,14 @@ router.post("/loginViaGoogle", async (req, res) => {
       const user = await User.findById(isExist._id).select(
         "-userDetails.password"
       );
-      res.json({
+      return res.json({
         success: true,
         message: "Signed in successfully",
         token,
         user,
       });
     } else {
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
         message: "User does not exists",
       });

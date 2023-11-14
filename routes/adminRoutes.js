@@ -87,15 +87,18 @@ router.post("/admin/verifyUser", authorizeUser, isAdmin, async (req, res) => {
     }
     findUser.status = 1;
     await findUser.save();
+
     // --------- Email User ------------
     const {email} = findUser;
     const {fName,lName,mName, name} = findUser.userDetails;
     const userName = name || fName + " " + mName + " " + lName;
-    await emailNewUser(email, userName)
+    const isSent = await sendAccountVerifiedMail(email, userName);
     // --------- Email User ------------
+
     return res.json({
       success: true,
       message: "User verified successfully! #",
+      isEmailSent : isSent
     });
   } catch (error) {
     console.log("There is some error in verifying user accounts :", error);
@@ -115,7 +118,6 @@ router.get("/admin/sendMail", async (req, res) => {
 //     name : userName,
 //     batch : 41
 //   }
-//   const isAlert = await emailAdminNewUserRegistered("satyanarayandalei8@gmail.com", userDetails);
 //   console.log("is Alert " , isAlert);
 //   console.log("is sent " , isSent);
   res.json({

@@ -14,7 +14,10 @@ const batchSchema = new Schema({
         type : Number,
         required: true,
     },
-    // studentLists : [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    totalRegistered : {
+        type : Number,
+        default: 0 
+    },
     strength : {
         type : Number,
         default : ""
