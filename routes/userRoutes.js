@@ -120,7 +120,7 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
           }
         }
         await newUser.save();
-        const userFullName = newUser.name ;
+        const userFullName = newUser.userDetails.name ;
         isBatchExists.totalRegistered += 1; // isBatchExists.totalRegistered = isBatchExists.totalRegistered + 1
         await isBatchExists.save();
         // ----------- Send Email to new user ------
