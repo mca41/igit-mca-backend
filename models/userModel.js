@@ -30,13 +30,26 @@ const userSchema = new Schema({
         default: 0
     },
     userDetails: {
-        fName: String,
-        lName: String,
-        mName: String,
-        homeDist: String,
-        regNum: String,
-        mobile:String,
-        gradCourse : String ,
+        name: {
+            type: String,
+            default : ""
+        },
+        homeDist: {
+            type:String,
+            default: ""
+        },
+        regNum: {
+            type:String,
+            default:""
+        },
+        mobile:{
+            type:String,
+            default:""
+        },
+        gradCourse : {
+            type:String,
+            default:""
+        } ,
         password : String,
         socialLinks : {
             linkedInLink : {

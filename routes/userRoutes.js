@@ -47,19 +47,8 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
       email,
       password,
       batch,
-      name,
-      lName,
-      mName,
-      fName,
-      regNum,
-      fieldOfInterest,
-      gradCourse,
+      fullName,
       homeDist,
-      linkedInLink,
-      githubLink,
-      mobile,
-      rollNum,
-      tag,
     } = textData; // getting data from frontend
     // Step 1 : check if user email already exists
     const isExists = await User.findOne({ email });
@@ -78,27 +67,12 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
         const hashedPassword = bcrypt.hashSync(password, saltRounds);
         const newUser = new User({
           email,
-          // batch, // not giving batchNum instead using batchId for find users of same batch. -> Because if batch Num is used in student it will be problem if we want to update batch
           batchId: isBatchExists._id,
           userDetails: {
-            name,
-            fName,
-            lName,
-            mName,
+            name: fullName ,
             homeDist,
-            regNum,
-            mobile,
-            gradCourse,
             password: hashedPassword,
-            socialLinks: {
-              linkedInLink,
-              githubLink,
-            },
           },
-          fieldOfInterest,
-          tag,
-          gradCourse,
-          rollNum,
           batchNum: isBatchExists.batchNum,
         });
         // --- Create JWT token ---
@@ -146,7 +120,7 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
           }
         }
         await newUser.save();
-        const userFullName = newUser.userDetails.fName + " " + newUser.userDetails.mName + " " + newUser.userDetails.lName ;
+        const userFullName = newUser.name ;
         isBatchExists.totalRegistered += 1; // isBatchExists.totalRegistered = isBatchExists.totalRegistered + 1
         await isBatchExists.save();
         // ----------- Send Email to new user ------
@@ -156,8 +130,6 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
           name: userFullName,
           batch: newUser.batchNum,
         });
-        console.log(" user mail ",isEmailSent);
-        console.log(" admin alert " ,isAdminAlerted);
         // ----------- Send Email to new user ------
         return res.json({
           success: true,

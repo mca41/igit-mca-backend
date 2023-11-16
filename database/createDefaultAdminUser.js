@@ -30,9 +30,7 @@ const createDefaultAdmin = async () => {
           isSpecialUser: "admin", // admin
           status: 1, // verified
           userDetails: {
-            fName: "Admin",
-            mName: "Igit",
-            lName: "MCA",
+            name: "Admin Igit MCA",
             password: hashedPassword,
           }
         });
