@@ -1,17 +1,15 @@
 require("dotenv").config();
-const nodemailer = require("nodemailer");
-
 // sending mail using API keys
 const brevo = require("@getbrevo/brevo");
 
 // For sending mail using SMTP server
-const smtpServer = process.env.SMTP_SERVER;
-const smtpPort = process.env.SMTP_PORT;
-const smtpUser = process.env.SMTP_USER;
-const smtpPass = process.env.SMTP_PASS;
+// const smtpServer = process.env.SMTP_SERVER; //smtp server
+// const smtpPort = process.env.SMTP_PORT; // port 
+// const smtpPass = process.env.SMTP_PASS; //password
+const smtpUser = process.env.SMTP_USER; // sender email
 const apiKey_VALUE = process.env.BREVO_API_KEY;
 
-const senderUserName = "IGIT MCA Commmunity";
+// const senderUserName = "IGIT MCA Commmunity";
 
 let defaultClient = brevo.ApiClient.instance;
 
@@ -21,54 +19,6 @@ apiKey.apiKey = apiKey_VALUE;
 let apiInstance = new brevo.TransactionalEmailsApi();
 let sendSmtpEmail = new brevo.SendSmtpEmail();
 
-const transporter = nodemailer.createTransport({
-  host: smtpServer,
-  port: smtpPort,
-  // secure: true,
-  auth: {
-    user: smtpUser,
-    pass: smtpPass,
-  },
-  tls: {
-    ciphers: "SSLv3",
-  },
-});
-const sendAccountCreatedMailUsingNodeMailer = async (email, userName) => {
-  const info = await transporter.sendMail({
-    from: `${senderUserName} <${smtpUser}>`, // sender address
-    to: email, // list of receivers
-    subject: "Account created!", // Subject line
-    text: `
-        Dear ${userName}, 
-        thank you for registering to IGIT MCA Community. Complete your profile by updating your other profile details by clicking on the profile icon.
-        We will let you know when Our admin verify your account.
-
-        You can get all study materials & including question, notices in our community website at https://igit-mca.vercel.app . You can also better learn about your classmates, seniors & juniors as well there.
-        
-        Happy coding :)
-        Have good day!
-        `,
-    html: `<html>
-        <body>
-            <p>
-                Dear ${userName}, 
-                thank you for registering to IGIT MCA Community. Complete your profile by updating your other profile details by clicking on the profile icon.
-                We will let you know when Our admin verify your account.
-                <br />
-                You can get all study materials & including question, notices in our community website. You can also better learn about your classmates, seniors & juniors as well there.
-                <br />
-                Happy coding :)
-                Have good day!
-            </p>
-            <br />
-            <p>
-               Learn more about us at <a href="https://igit-mca.vercel.app">https://igit-mca.vercel.app</a>
-            </p>
-        </body>
-     </html>`,
-  });
-  console.log("Message sent: %s", info);
-};
 
 //  this mail is going to be sent User who newly registered
 const emailNewUser = async (
@@ -226,7 +176,6 @@ const emailAdminNewUserRegistered = async (adminEmail, userDetails) => {
   }
 };
 module.exports = {
-  sendAccountCreatedMailUsingNodeMailer,
   emailNewUser,
   sendAccountVerifiedMail,
   emailAdminNewUserRegistered,

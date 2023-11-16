@@ -8,10 +8,7 @@ const Batch = require("../models/batchModel");
 const authorizeUser = require("../middlewares/authorizeUser");
 const { isAdmin } = require("../middlewares/isAdmin");
 const {
-  sendAccountCreatedMailUsingNodeMailer,
-  emailNewUser,
   sendAccountVerifiedMail,
-  emailAdminNewUserRegistered,
 } = require("../helper/sendMail");
 
 router.get("/fetchAccounts", authorizeUser, isAdmin, async (req, res) => {
