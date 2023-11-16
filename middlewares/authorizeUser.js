@@ -1,7 +1,7 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
-
-const authorizeUser = (req, res, next) => {
+const User = require('../models/userModel')
+const authorizeUser = async (req, res, next) => {
     try {
         const authToken = req.headers.token;
         if (!authToken) {
@@ -30,6 +30,13 @@ const authorizeUser = (req, res, next) => {
                 // user verified and userId added to request
 
                 // here you can also check whether user is actually exists in database :: Just for extra security 
+                const findUser = await User.findById(tokenData.userId);
+                if (!findUser) {
+                    return res.status(401).json({
+                        success: false,
+                        message: "unauthorized access"
+                    })
+                }
                 req.userId = tokenData.userId;
                 next()
             }
