@@ -48,7 +48,7 @@ const userSchema = new Schema({
         },
         gradCourse : {
             type:String,
-            default:""
+            default:"nothing selected"
         } ,
         password : String,
         socialLinks : {
@@ -65,7 +65,7 @@ const userSchema = new Schema({
     },
     fieldOfInterest:{
         type : String,
-        default: ""
+        default: "nothing selected"
     },
     // assigned coordination tag : ex - Class Representative or Placement Coordinator
     tag : {
