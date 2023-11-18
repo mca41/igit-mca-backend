@@ -30,6 +30,7 @@ app.use("/api/user/", require("./routes/userRoutes"));
 app.use("/api/batch/",require("./routes/batchRoutes"))
 app.use("/api/coordinators/",require("./routes/coordinators"));
 app.use("/api/accounts",require("./routes/adminRoutes")); // fetches all users account for admin page
+app.use("/api/user/editProfile", require("./routes/userProfileEdit")); // to edit users profile
 
 // ---- HOME ROUTE -----
 app.get("/",(req,res)=>{
