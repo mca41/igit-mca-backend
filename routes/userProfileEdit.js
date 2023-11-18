@@ -8,15 +8,16 @@ router.delete("/profilePicture", authorizeUser, async (req, res) => {
     try {
         const userId = req.userId;
         const findUser = await User.findById(userId);
-        findUser.profilePic.givenName = ""
-        findUser.profilePic.url = ""
+        findUser.profilePic.givenName = "";
+        findUser.profilePic.url = "";
         await findUser.save();
 
-       return res.json({
+        return res.json({
             success: true,
             message: "Profile pic deleted. #"
         })
     } catch (error) {
+        console.log("There is some error in deleting profile picture ", error);
         return res.status(505).json({
             success: false,
             message: "Some error occurred # internal server",
@@ -28,30 +29,121 @@ router.delete("/profilePicture", authorizeUser, async (req, res) => {
 router.put("/profilePicture", authorizeUser, async (req, res) => {
     try {
         const userId = req.userId;
-        const {url, givenName} = req.body;
+        const { url, givenName } = req.body;
         if (!url || !givenName) {
             return res.status(400).json({
-                success:false,
-                message:"Invalid credentials #"
+                success: false,
+                message: "Invalid credentials #"
             })
         }
-        const findUser = await User.findByIdAndUpdate(userId,{
-            profilePic : {
-                givenName ,
-                url
-            }
-        });
+        const findUser = await User.findById(userId);
+        findUser.profilePic = {
+            url,
+            givenName
+        }
         await findUser.save();
         return res.json({
-            success:true,
-            message:"Profile picture updated successfully. #"
+            success: true,
+            message: "Profile picture updated successfully. #"
         })
     } catch (error) {
+        console.log("There is some error in updating profile picture ", error);
         return res.status(505).json({
             success: false,
             message: "Some error occurred # internal server",
         })
     }
 })
+
+// To update graduation course 
+router.put("/gradCourse", authorizeUser, async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { gradCourse } = req.body;
+        if (!gradCourse) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid credentials. #"
+            })
+        }
+        const findUser = await User.findById(userId);
+        findUser.userDetails.gradCourse = gradCourse;
+        await findUser.save();
+
+        return res.json({
+            success: true,
+            message: "Graduation updated successfully. #"
+        })
+
+    } catch (error) {
+        console.log("There is some error in updating profile picture ", error);
+        return res.status(505).json({
+            success: false,
+            message: "Some error occurred # internal server",
+        })
+    }
+})
+
+// to update field of interest
+router.put("/fieldOfInterest", authorizeUser, async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { fieldOfInterest } = req.body;
+        if (!fieldOfInterest) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid credentials. #"
+            })
+        }
+        const findUser = await User.findById(userId);
+        findUser.fieldOfInterest = fieldOfInterest;
+        await findUser.save();
+
+        return res.json({
+            success: true,
+            message: "Field of interest updated successfully. #"
+        })
+
+    } catch (error) {
+        console.log("There is some error in updating filed of interest ", error);
+        return res.status(505).json({
+            success: false,
+            message: "Some error occurred # internal server",
+        })
+    }
+})
+
+
+router.put("/socialLinks", authorizeUser, async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { socialLinks } = req.body;
+        if (!socialLinks) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid credentials. #"
+            })
+        }
+        const {githubLink, linkedInLink} = socialLinks;
+        const findUser = await User.findById(userId);
+        findUser.userDetails.socialLinks = {
+            githubLink, 
+            linkedInLink
+        }
+        await findUser.save();
+
+        return res.json({
+            success: true,
+            message: "Field of interest updated successfully. #"
+        })
+    } catch (error) {
+        console.log("There is some error in updating filed of interest ", error);
+        return res.status(505).json({
+            success: false,
+            message: "Some error occurred # internal server",
+        })
+    }
+})
+
 
 module.exports = router;
