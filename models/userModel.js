@@ -39,12 +39,10 @@ const userSchema = new Schema({
             default: ""
         },
         regNum: {
-            type:String,
-            default:""
+            type:String
         },
         mobile:{
-            type:String,
-            default:""
+            type:String
         },
         gradCourse : {
             type:String,
