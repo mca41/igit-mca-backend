@@ -105,7 +105,7 @@ router.get("/fetchBatchLists", async (req, res) => {
   try {
     const findAllBatchLists = await Batch.find({ branch: "mca" }).select({
       studentLists: 0,
-      strength: 0,
+      // strength: 0,
       branch: 0,
     });
     res.json({

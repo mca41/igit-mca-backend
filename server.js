@@ -31,6 +31,8 @@ app.use("/api/batch/",require("./routes/batchRoutes"))
 app.use("/api/coordinators/",require("./routes/coordinators"));
 app.use("/api/accounts",require("./routes/adminRoutes")); // fetches all users account for admin page
 app.use("/api/user/editProfile", require("./routes/userProfileEdit")); // to edit users profile
+app.use("/api/post", require("./routes/postRoute")); // to create & delete post
+
 
 // ---- HOME ROUTE -----
 app.get("/",(req,res)=>{
