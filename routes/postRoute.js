@@ -32,14 +32,44 @@ router.post("/createNewPost", authorizeUser, async (req, res) => {
         res.json({
             success: true,
             message: "New post created.",
-            data : {
-                post : newPost
+            data: {
+                post: newPost
             }
         })
 
     } catch (error) {
         console.log("Some error in creating new post : ", error);
         res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+})
+
+
+router.get("/fetchPosts", authorizeUser, async (req, res) => {
+    try {
+        const { postType } = req.query;
+        if (!postType) {
+            return res.status(401).json({
+                success: false,
+                message: "Not post type provided in query"
+            })
+        }
+        const findPosts = await Post.find({postType:"gallery"})
+
+        return res.json({
+            success:true,
+            message: `All ${postType} posts sent`,
+            data : {
+                postsLength : findPosts.length,
+                posts : findPosts.reverse()
+            }        
+        })
+
+    } catch (error) {
+        console.log("Some error in fetching post : ", error);
+        return res.status(500).json({
             success: false,
             message: "Internal server error",
         });
