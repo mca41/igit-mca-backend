@@ -76,4 +76,39 @@ router.get("/fetchPosts", authorizeUser, async (req, res) => {
     }
 })
 
+
+router.delete("/deletePost", authorizeUser, async (req,res)=>{
+    try {
+       const userId = req.userId;
+       const {postId} = req.query;
+
+       const findUser = await User.findById(userId);
+       if (findUser.isSpecialUser !== "admin") {
+         return res.status(400).json({
+            success : false,
+            message : "Not authorized to perform task # User can't perform this delete task"
+         })
+       }
+
+       if (!postId) {
+          return res.status(401).json({
+            success : false,
+            message : "No post id provided # there should be a postId to delete post"
+          })
+       }
+
+       await Post.findByIdAndDelete(postId)
+        return res.json({
+            success:true,
+            message : "Post deleted! successfully"
+        })
+    } catch (error) {
+        console.log("Some error in deleting post : ", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+})
+
 module.exports = router;
