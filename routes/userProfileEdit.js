@@ -2,20 +2,40 @@ const express = require("express");
 const router = express.Router();
 const authorizeUser = require("../middlewares/authorizeUser");
 const User = require("../models/userModel")
-
+const { getStorage, ref, deleteObject, uploadBytes, getDownloadURL, } = require("firebase/storage");
+const { initializeApp } = require("firebase/app");
 // Delete profile picture
+const firebaseConfig = require("../firebase/firebaseConfig")
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
+
+
 router.delete("/profilePicture", authorizeUser, async (req, res) => {
     try {
         const userId = req.userId;
         const findUser = await User.findById(userId);
-        findUser.profilePic.givenName = "";
-        findUser.profilePic.url = "";
-        await findUser.save();
+        const batch = findUser.batchNum;
+        const givenName = findUser.profilePic.givenName ;
+        const deleteProfileImageRef = ref(storage, `images/profileImages/${batch}/${givenName}`) ;
 
-        return res.json({
-            success: true,
-            message: "Profile pic deleted. #"
+
+        deleteObject(deleteProfileImageRef)
+        .then(async () => {
+            findUser.profilePic.givenName = "";
+            findUser.profilePic.url = "";
+            await findUser.save();
+            return res.json({
+                success: true,
+                message: "Profile pic deleted. #"
+            })
         })
+        .catch((error) => {
+            console.log("Error in deleting image", error);
+            return res.json({
+                success: false,
+                message: "Some error in deleting Profile pic deleted. #"
+            })
+        });
     } catch (error) {
         console.log("There is some error in deleting profile picture ", error);
         return res.status(505).json({
