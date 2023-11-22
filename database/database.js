@@ -13,8 +13,10 @@ const connectToDatabase = async ()=>{
         console.log("connected to database");
         // this function of creating an admin user only runs when database connected successfully
         createDefaultAdmin();
+        return true;
     } catch (error) {
         console.log("Unable to connect database ", error);
+        return false;
     }
 }
 

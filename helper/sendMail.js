@@ -175,8 +175,54 @@ const emailAdminNewUserRegistered = async (adminEmail, userDetails) => {
     return false;
   }
 };
+const serverDownEmail = async (currentAdminEmail, errorMessage)=>{
+  try {
+    sendSmtpEmail.subject = "Server Down!";
+    sendSmtpEmail.htmlContent = `
+    <html>
+        <body>
+            <p>
+                Dear Admin, 
+                Igit-Mca-community server is down.
+            </p>
+            <br />
+            <p>
+              Errror : ${errorMessage} <br/>
+            </p>
+            <br />
+            <p>
+              Please check it out!
+            </p>
+        </body>
+    </html> 
+    `;
+    sendSmtpEmail.sender = {
+      // name: senderUserName,
+      email: `${smtpUser}`,
+    };
+    sendSmtpEmail.to = [
+      {
+        email: currentAdminEmail,
+      },
+    ];
+    sendSmtpEmail.headers = { "Server Down!": currentAdminEmail };
+    sendSmtpEmail.params = {
+      parameter: "Notify email to current admin.",
+      subject: "Server down!",
+    };
+    const { messageId } = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    if (!messageId) {
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.log("error in sending, [server down] email  : ", error);
+    return false;
+  }
+}
 module.exports = {
   emailNewUser,
   sendAccountVerifiedMail,
   emailAdminNewUserRegistered,
+  serverDownEmail,
 };
