@@ -21,7 +21,7 @@ router.get("/:batchId", async (req, res) => {
                 },
                 fieldOfInterest : 0,
             });
-            res.json({
+            return res.json({
                 success : true,
                 message: "All batch coordinator sent",
                 batchCoordinators
