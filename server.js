@@ -22,12 +22,7 @@ const connectToDatabase = require("./database/database");
 
 // ---------- MIDDLEWARE ------------
 app.use(bodyParser.urlencoded({ extended: false }));
-const origin1 = process.env.ALLOWED_ORIGIN1;
-app.use(cors({
-   origin : "https://igit-mca.vercel.app",
-   methods:["GET","POST","DELETE","PUT"],
-   credentials : true
-}));
+app.use(cors());
 app.use(express.json());
 
 const homeResponseData = {
