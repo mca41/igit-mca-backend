@@ -119,7 +119,19 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
         await isBatchExists.save();
         // ----------- Send Email to new user ------
         const isEmailSent = await emailNewUser(newUser.email, userFullName);
-        const isAdminAlerted = await emailAdminNewUserRegistered(adminEmail, {
+        // find batch Admin for this registered user batch
+        const findBatchAdmin = await User.find({
+          isSpecialUser : "batchAdmin",
+          batchNum : newUser.batchNum
+        });
+        console.log(findBatchAdmin); // this is an array
+        let finalAlertingAdminEmail;
+        if (findBatchAdmin.length === 0) {
+          finalAlertingAdminEmail = adminEmail ; // there is no batch admin so send email to main Admin
+        }else{
+          finalAlertingAdminEmail = findBatchAdmin[0].email ;
+        }
+        const isAdminAlerted = await emailAdminNewUserRegistered(finalAlertingAdminEmail, {
           email: newUser.email,
           name: userFullName,
           batch: newUser.batchNum,
