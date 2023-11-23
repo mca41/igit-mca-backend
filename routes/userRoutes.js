@@ -43,13 +43,7 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
     const textData = JSON.parse(req.body.textData);
     // credentials
     // need to validate credentials
-    const {
-      email,
-      password,
-      batch,
-      fullName,
-      homeDist,
-    } = textData; // getting data from frontend
+    const { email, password, batch, fullName, homeDist } = textData; // getting data from frontend
     // Step 1 : check if user email already exists
     const isExists = await User.findOne({ email });
     if (isExists) {
@@ -69,7 +63,7 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
           email,
           batchId: isBatchExists._id,
           userDetails: {
-            name: fullName ,
+            name: fullName,
             homeDist,
             password: hashedPassword,
           },
@@ -98,16 +92,16 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
           };
           // ---- if user has sent profile image , first save to firebase
           if (fileType === "image/jpeg" || fileType === "image/png") {
-              const uploadProfilePicRef = ref(
-                profileImagesRef,
-                `${batch}/${docGivenName}`
-              );
-              const snapShot = await uploadBytes(
-                uploadProfilePicRef,
-                bufferData,
-                metaData
-              );
-              userProfileUrl = await getDownloadURL(snapShot.ref);
+            const uploadProfilePicRef = ref(
+              profileImagesRef,
+              `${batch}/${docGivenName}`
+            );
+            const snapShot = await uploadBytes(
+              uploadProfilePicRef,
+              bufferData,
+              metaData
+            );
+            userProfileUrl = await getDownloadURL(snapShot.ref);
           }
           if (userProfileUrl === "" || userProfileUrl === "error") {
             finalMessage = "Account created but profile picture upload failed!";
@@ -120,7 +114,7 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
           }
         }
         await newUser.save();
-        const userFullName = newUser.userDetails.name ;
+        const userFullName = newUser.userDetails.name;
         isBatchExists.totalRegistered += 1; // isBatchExists.totalRegistered = isBatchExists.totalRegistered + 1
         await isBatchExists.save();
         // ----------- Send Email to new user ------
@@ -244,17 +238,67 @@ router.get("/fetchUser", authorizeUser, async (req, res) => {
     const findUser = await User.findById(userId).select(
       "-userDetails.password"
     );
-    res.json({
+    return res.json({
       success: true,
       message: "user data sent",
       user: findUser,
     });
   } catch (error) {
-    res.status(500).json({
+    console.log("Some error occurred in fetching user : ", error);
+    return res.status(500).json({
       success: false,
       message: "Some internal server occurred! Try after some time",
     });
   }
 });
 
+// Not protected route :: sends - name, profile pic, social links, batch
+router.get("/fetchUserById", async (req, res) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "No userId provided!",
+      });
+    }
+
+    const findUser = await User.findById(userId).select({
+      email : 0,
+      batchId: 0,
+      batchId: 0,
+      userType : 0,
+      isSpecialUser : 0,
+      status : 0 ,
+      fieldOfInterest : 0,
+      tag : 0,
+      isTag : 0,
+      profilePic : {
+        givenName : 0,
+      },
+      userDetails: {
+        password: 0,
+        mobile: 0,
+        homeDist: 0,
+        regNum: 0,
+        gradCourse: 0,
+      },
+      registrationDate : 0
+    });
+
+    return res.json({
+      success : true,
+      message : "User details sent!",
+      data : {
+        user : findUser
+      }
+    })
+  } catch (error) {
+    console.log("Some error occurred in fetching user by ID : ", error);
+    return res.status(500).json({
+      success: false,
+      message: "Some internal server occurred! Try after some time",
+    });
+  }
+});
 module.exports = router;
