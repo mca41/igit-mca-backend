@@ -124,7 +124,6 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
           isSpecialUser : "batchAdmin",
           batchNum : newUser.batchNum
         });
-        console.log(findBatchAdmin); // this is an array
         let finalAlertingAdminEmail;
         if (findBatchAdmin.length === 0) {
           finalAlertingAdminEmail = adminEmail ; // there is no batch admin so send email to main Admin
