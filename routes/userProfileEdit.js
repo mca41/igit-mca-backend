@@ -154,7 +154,7 @@ router.put("/socialLinks", authorizeUser, async (req, res) => {
 
         return res.json({
             success: true,
-            message: "Field of interest updated successfully. #"
+            message: "Social link updated successfully. #"
         })
     } catch (error) {
         console.log("There is some error in updating filed of interest ", error);
