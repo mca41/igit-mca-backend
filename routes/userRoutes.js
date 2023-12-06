@@ -124,25 +124,42 @@ router.post("/createUser", upload.single("imageFile"), async (req, res) => {
           isSpecialUser : "batchAdmin",
           batchNum : newUser.batchNum
         });
-        let finalAlertingAdminEmail;
+        let finalAlertingAdminEmails = [];
         if (findBatchAdmin.length === 0) {
-          finalAlertingAdminEmail = adminEmail ; // there is no batch admin so send email to main Admin
+          finalAlertingAdminEmails.push(adminEmail); // there is no batch admin so send email to main Admin
         }else{
-          finalAlertingAdminEmail = findBatchAdmin[0].email ;
+          for (let i = 0; i < findBatchAdmin.length ; i++) {
+            if (i >= 2) {
+              break;
+            }
+            finalAlertingAdminEmails.push(findBatchAdmin[i].email);
+          }
         }
-        const isAdminAlerted = await emailAdminNewUserRegistered(finalAlertingAdminEmail, {
-          email: newUser.email,
-          name: userFullName,
-          batch: newUser.batchNum,
+        let totalAdminAlerted = 0;
+        for (const adminEmail of finalAlertingAdminEmails) {
+          const isAdminAlerted = await emailAdminNewUserRegistered(adminEmail, {
+            email: newUser.email,
+            name: userFullName,
+            batch: newUser.batchNum,
+          });
+          if (isAdminAlerted) {
+            totalAdminAlerted++;
+          }
+        }
+        const findNewUser = await User.findById(newUser._id).select({
+          userDetails : {
+            password : 0
+          }
         });
         // ----------- Send Email to new user ------
         return res.json({
           success: true,
           message: finalMessage,
-          user: newUser,
+          user: findNewUser,
           token,
           isEmailSentToUser: isEmailSent,
-          isAdminNotified: isAdminAlerted,
+          isAdminNotified: totalAdminAlerted > 0,
+          totalAdminNotified :  totalAdminAlerted,
         });
         // ----- USER REGISTRATION Ends --
       } else {
