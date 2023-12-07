@@ -12,7 +12,46 @@ const storage = getStorage(app);
 
 router.delete("/profilePicture", authorizeUser, async (req, res) => {
     try {
-        const userId = req.userId;
+        // const userId = req.userId;
+        let {sameUser, editingUserId} = req.query;
+        if (!sameUser) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid credentials # sameUser credential not given."
+            })
+        }
+        sameUser = sameUser === "true" ? true : false ;
+        editingUserId = editingUserId === "null" ? null : editingUserId;
+        if (
+            (sameUser === false && !editingUserId) ||  // is editingUserId given
+            (sameUser === false && editingUserId === null)  
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid credentials # sameUser credential not given."
+            })
+        }
+        
+        const currentUserId = req.userId;
+        let userId;
+
+        if(sameUser !== true) {
+            // when user is not itself --> Could be a admin
+            // check whether other user is admin or super admin is
+            let findAdminUser = await User.findById(currentUserId);
+            if (findAdminUser.isSpecialUser === "admin" || findAdminUser.isSpecialUser === "superAdmin") {
+                userId = editingUserId;
+            }else{
+                return res.status(401).json({
+                    success : false,
+                    message : "Unauthorized attempt! #"
+                })
+            }
+        }else{
+            // when user is itself
+            userId = currentUserId;
+        }
+
         const findUser = await User.findById(userId);
         const batch = findUser.batchNum;
         const givenName = findUser.profilePic.givenName ;
@@ -48,7 +87,43 @@ router.delete("/profilePicture", authorizeUser, async (req, res) => {
 // update profile picture
 router.put("/profilePicture", authorizeUser, async (req, res) => {
     try {
-        const userId = req.userId;
+        let {sameUser, editingUserId} = req.query;
+        if (!sameUser) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid credentials # "
+            })
+        }
+        sameUser = sameUser === "true" ? true : false ;
+        editingUserId = editingUserId === "null" ? null : editingUserId;
+        if (
+            (sameUser === false && !editingUserId) ||  // is editingUserId given if its not same user
+            (sameUser === false && editingUserId === null)  
+            ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid credentials #"
+            })
+        }
+        const currentUserId = req.userId;
+        let userId;
+        if(sameUser !== true) {
+            // when user is not itself --> Could be a admin
+            // check whether other user is admin or super admin is 
+            let findAdminUser = await User.findById(currentUserId);
+            if (findAdminUser.isSpecialUser === "admin" || findAdminUser.isSpecialUser === "superAdmin") {
+                userId = editingUserId;
+            }else{
+                return res.status(401).json({
+                    success : false,
+                    message : "Unauthorized attempt! #"
+                })
+            }
+        }else{
+            // when user is itself
+            userId = currentUserId;
+        }
+
         const { url, givenName } = req.body;
         if (!url || !givenName) {
             return res.status(400).json({
